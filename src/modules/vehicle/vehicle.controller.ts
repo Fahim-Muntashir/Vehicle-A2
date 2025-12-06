@@ -21,6 +21,97 @@ const createVehicle = async (req: Request, res: Response) => {
   }
 };
 
+const getAllVehicles = async (req: Request, res: Response) => {
+  try {
+    // Logic to create a new user
+
+    const vehicles = await vehicleServices.getAllVehicles();
+
+    if (vehicles.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No vehicles found",
+        data: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Vehicles retrieved successfully",
+      data: vehicles,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: "false",
+      message: error.message,
+    });
+  }
+};
+
+const getVehicleById = async (req: Request, res: Response) => {
+  try {
+    const vehicle = await vehicleServices.getVehicleById(Number(req.params.id));
+
+    if (!vehicle)
+      return res
+        .status(404)
+        .json({ success: false, message: "Vehicle not found" });
+
+    return res.status(200).json({
+      success: true,
+      message: "Vehicle retrieved successfully",
+      data: vehicle,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: "false",
+      message: error.message,
+    });
+  }
+};
+const updateVehicle = async (req: Request, res: Response) => {
+  try {
+    const vehicle = await vehicleServices.updateVehicle(
+      Number(req.params.id),
+      req.body
+    );
+
+    if (!vehicle)
+      return res
+        .status(404)
+        .json({ success: false, message: "Vehicle not found" });
+
+    return res.status(200).json({
+      success: true,
+      message: "Vehicle updated successfully",
+      data: vehicle,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: "false",
+      message: error.message,
+    });
+  }
+};
+
+const deleteVehicle = async (req: Request, res: Response) => {
+  try {
+    await vehicleServices.deleteVehicle(Number(req.params.id));
+    return res.status(200).json({
+      success: "true",
+      message: "Vehicle deleted successfully",
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: "false",
+      message: error.message,
+    });
+  }
+};
 export const vehicleController = {
   createVehicle,
+  getAllVehicles,
+  getVehicleById,
+  updateVehicle,
+  deleteVehicle,
 };
