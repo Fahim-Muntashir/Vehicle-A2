@@ -12,8 +12,9 @@ export const initDB = async () => {
                 name VARCHAR(100) NOT NULL,       
                 email VARCHAR(100) UNIQUE NOT NULL,  
                 password TEXT NOT NULL,
+                phone VARCHAR(30) NOT NULL,
                 role VARCHAR(20) NOT NULL CHECK (role IN ('admin','customer')),
-                age INT,
+                
                 created_at TIMESTAMP DEFAULT NOW(),                
                 updated_at TIMESTAMP DEFAULT NOW()
                 )        
