@@ -44,9 +44,12 @@ const loginUserIntoDB = async (email: string, password: string) => {
   };
 
   delete user.rows[0].password;
+  delete user.rows[0].created_at;
+  delete user.rows[0].updated_at;
+  delete user.rows[0].password;
   const token = jwt.sign(jwtPayload, secret, { expiresIn: "3d" });
 
-  return { token, userRows: user.rows[0] };
+  return { token, user: user.rows[0] };
 };
 
 export const authServices = {
