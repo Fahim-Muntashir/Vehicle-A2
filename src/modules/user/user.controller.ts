@@ -41,7 +41,30 @@ const getAllUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+const getSingleUser = async (req: Request, res: Response) => {
+  try {
+    // Logic to create a new user
+
+    const email = req.user?.email as string;
+    const result = await userServices.getSingleUser(email);
+
+    console.log(result);
+    return res.status(201).json({
+      success: "true",
+      message: "User created successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: "false",
+      message: error.message,
+    });
+  }
+};
+
 export const userController = {
   createUser,
   getAllUser,
+  getSingleUser,
 };
