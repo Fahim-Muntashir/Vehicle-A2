@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { secret } from "../modules/auth/auth.service";
 import { pool } from "../database/db";
+import config from "../config";
 
 interface MyJwtPayload extends JwtPayload {
   id: number;
@@ -26,9 +26,10 @@ const auth = (...roles: ("admin" | "customer")[]) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const decoded = jwt.verify(token, secret) as unknown as MyJwtPayload;
-    console.log("User role:", decoded.role); // check role
-    console.log("Allowed roles:", roles);
+    const decoded = jwt.verify(
+      token,
+      config.jwtSecret as string
+    ) as unknown as MyJwtPayload;
     const user = await pool.query(
       `
       SELECT * FROM users WHERE email=$1`,
