@@ -3,18 +3,32 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { secret } from "../modules/auth/auth.service";
 import { pool } from "../database/db";
 
-const auth = (...roles: ("admin" | "user")[]) => {
-  console.log(roles);
+interface MyJwtPayload extends JwtPayload {
+  id: number;
+  role: "admin" | "customer";
+  email: string;
+}
 
+const auth = (...roles: ("admin" | "customer")[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization;
+    const tokenHeader = req.headers.authorization;
 
-    if (!token) {
+    if (!tokenHeader) {
       throw new Error("no token provided");
     }
 
-    const decoded = jwt.verify(token, secret) as JwtPayload;
+    // const
+    const token = tokenHeader.startsWith("Bearer ")
+      ? tokenHeader.split(" ")[1]
+      : tokenHeader;
 
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const decoded = jwt.verify(token, secret) as unknown as MyJwtPayload;
+    console.log("User role:", decoded.role); // check role
+    console.log("Allowed roles:", roles);
     const user = await pool.query(
       `
       SELECT * FROM users WHERE email=$1`,
@@ -26,7 +40,7 @@ const auth = (...roles: ("admin" | "user")[]) => {
     }
     req.user = decoded;
 
-    if (roles.length && roles.includes(decoded.role))
+    if (roles.length && !roles.includes(decoded.role))
       throw new Error("you are not authorize");
 
     next();

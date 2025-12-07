@@ -5,8 +5,16 @@ import auth from "../../middleware/auth";
 import { Roles } from "../auth/auth.constant";
 
 const router = Router();
-
+// auth(Roles.admin),
 router.get("/", auth(Roles.admin), userController.getAllUser);
-router.get("/singleuser", auth(Roles.user), userController.getSingleUser);
 
+router.get("/singleuser", auth(Roles.customer), userController.getSingleUser);
+
+router.put(
+  "/:id",
+  auth(Roles.admin, Roles.customer),
+  userController.updateUser
+);
+
+router.delete("/:id", auth(Roles.admin), userController.deleteUser);
 export const userRoute = router;
