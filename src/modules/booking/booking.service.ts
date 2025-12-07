@@ -41,25 +41,17 @@ const createBooking = async (booking: {
 
   return { ...bookingRes.rows[0], vehicle };
 };
-
 const getBookings = async (user: { id: number; role: string }) => {
-  if (user.role === "admin") {
-    const res = await pool.query(
-      `select b.*,u.name as customer_name,u.email as customer_email,
-            v.vehicle_name,v.registration_number
-            FROM booking b 
-            JOIN users u ON b.customer_id=u.id
-            JOIN vehicles v ON b.vehicle_id=v.id`
-    );
+  if (user?.role === "admin") {
+    const bookingRes = await pool.query(`SELECT * FROM bookings`);
 
-    return res.rows;
+    return bookingRes.rows;
   } else {
     const res = await pool.query(
-      `SELECT b. *, v.vehicle_name,v.registration_number,v.type
-        
-        FROM booking b
-        JOIN vehicle v ON b.vehicleId=v.id
-        WHERE b.customer_id=$1`,
+      `SELECT b.*, v.vehicle_name, v.registration_number, v.type
+       FROM bookings b
+       JOIN vehicles v ON b.vehicle_id=v.id
+       WHERE b.customer_id=$1`,
       [user.id]
     );
     return res.rows;
@@ -67,14 +59,15 @@ const getBookings = async (user: { id: number; role: string }) => {
 };
 
 const updateBookings = async (bookingId: number, status: string) => {
-  // 1. Get booking
+  console.log(status);
   const bookingRes = await pool.query(`SELECT * FROM bookings WHERE id=$1`, [
     bookingId,
   ]);
+  if (!status) throw new Error("Status must be provided");
+
   const booking = bookingRes.rows[0];
   if (!booking) throw new Error("Booking not found");
 
-  // 2. Update booking status
   await pool.query(`UPDATE bookings SET status=$1 WHERE id=$2`, [
     status,
     bookingId,
@@ -82,7 +75,8 @@ const updateBookings = async (bookingId: number, status: string) => {
 
   let vehicle;
 
-  // 3. If returned, update vehicle availability
+  if (!status) throw new Error("Status must be provided");
+
   if (status === "returned") {
     const vehicleRes = await pool.query(
       `UPDATE vehicles SET availability_status='available' WHERE id=$1 RETURNING *`,

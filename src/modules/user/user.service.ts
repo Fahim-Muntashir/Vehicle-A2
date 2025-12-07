@@ -4,10 +4,9 @@ import { pool } from "../../database/db";
 const getAllUser = async () => {
   const result = await pool.query(
     `
-    SELECT id,name,email,phone, FROM users
+    SELECT id,name,email,phone FROM users
     `
   );
-
   return result;
 };
 

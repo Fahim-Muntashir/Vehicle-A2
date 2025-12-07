@@ -5,10 +5,8 @@ import { userServices } from "./user.service";
 
 const getAllUser = async (req: Request, res: Response) => {
   try {
-    // Logic to create a new user
-
+    console.log("heelo");
     const result = await userServices.getAllUser();
-
     console.log(result);
     return res.status(201).json({
       success: "true",

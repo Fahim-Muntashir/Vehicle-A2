@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { userController } from "./user.controller";
-import verify from "../../middleware/verify";
 import auth from "../../middleware/auth";
 import { Roles } from "../auth/auth.constant";
 
