@@ -45,6 +45,7 @@ const getVehicleById = async (id: number) => {
 const updateVehicle = async (id: number, payload: Record<string, unknown>) => {
   const fields = Object.keys(payload);
   const values = Object.values(payload);
+  delete payload.registration_number;
 
   const setQuery = fields
     .map(
@@ -54,7 +55,10 @@ const updateVehicle = async (id: number, payload: Record<string, unknown>) => {
     .join(", ");
 
   const result = await pool.query(
-    `UPDATE vehicles SET ${setQuery} WHERE id=$${fields.length + 1} RETURNING *`
+    `UPDATE vehicles SET ${setQuery} WHERE id=$${
+      fields.length + 1
+    } RETURNING *`,
+    [...values, id]
   );
 
   return result.rows[0];
